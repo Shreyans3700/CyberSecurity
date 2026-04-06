@@ -12,10 +12,12 @@ from network_security.constants.training_pipeline import IngestionArtifact
 
 class DataIngestionPipeline:
     """
-    This class is responsible for ingesting data from MongoDB, normalizing it, and saving it as CSV files for training and testing. It also handles the creation of necessary directories and manages the file paths for the raw, train, and test datasets.
+    Handles extraction of data from MongoDB, normalization of the raw dataset, and persistence of raw, training, and test CSV files.
     """
 
     def __init__(self):
+        """Initialize file paths, MongoDB client settings, and ingestion configuration."""
+
         self.data_dir = os.path.join(os.getcwd(), TrainingPipelineConfig.ARTIFACT_DIR)
         self.raw_file_path = os.path.join(
             self.data_dir, TrainingPipelineConfig.RAW_FILE_NAME
@@ -33,6 +35,11 @@ class DataIngestionPipeline:
         self.artifact_dir = IngestionArtifact
 
     def ingest_collection_from_mongodb(self):
+        """Fetch all documents from the configured MongoDB collection.
+
+        Returns:
+            list: Documents retrieved from MongoDB as Python dictionaries.
+        """
         try:
             db = self.mongo_client[self.database_name]
             collection = db[self.collection_name]
@@ -43,6 +50,15 @@ class DataIngestionPipeline:
             raise NetworkSecurityException(e, sys)
 
     def normalize_data(self, df):
+        """Normalize the dataframe by removing MongoDB metadata and converting missing values to NaN.
+
+        Args:
+            df (pd.DataFrame): Raw dataframe loaded from MongoDB.
+
+        Returns:
+            pd.DataFrame: Normalized dataframe ready for CSV export.
+        """
+
         try:
             if "_id" in df.columns:
                 df = df.drop("_id", axis=1)
@@ -55,6 +71,15 @@ class DataIngestionPipeline:
             raise NetworkSecurityException(e, sys)
 
     def save_data_to_csv(self, df, file_path):
+        """Save a pandas DataFrame to a CSV file.
+
+        Args:
+            df (pd.DataFrame): Dataframe to save.
+            file_path (str): Destination file path for the CSV.
+
+        Returns:
+            None
+        """
         try:
             df.to_csv(file_path, index=False)
             logging.info(f"Data saved successfully to {file_path}")
@@ -62,6 +87,12 @@ class DataIngestionPipeline:
             raise NetworkSecurityException(e, sys)
 
     def ingest_data(self):
+        """Perform end-to-end ingestion: fetch, normalize, split, and save raw/train/test datasets.
+
+        Returns:
+            IngestionArtifact: Artifact containing train and test file paths.
+        """
+
         try:
             ## create the directory if it does not exist
             os.makedirs(self.data_dir, exist_ok=True)

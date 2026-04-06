@@ -11,6 +11,8 @@ from network_security.constants.data_validation import DataValidationArtifact
 
 
 class DataValidation:
+    """Handles validation of ingested datasets, including schema checks and drift detection."""
+
     def __init__(self):
         self.data_validation_dir = os.path.join(
             os.getcwd(), DataValidationConstants.DATA_VALIDATION_DIR_NAME
@@ -32,6 +34,14 @@ class DataValidation:
         self.validation_artifact = DataValidationArtifact()
 
     def read_source_data(self, file_path: str) -> pd.DataFrame:
+        """Read a CSV file from the provided path.
+
+        Args:
+            file_path (str): Path to the source CSV file.
+
+        Returns:
+            pd.DataFrame: Loaded data as a pandas DataFrame.
+        """
         try:
             logging.info(f"Reading source data from {file_path}")
             data = pd.read_csv(file_path, index_col=False)
@@ -41,6 +51,14 @@ class DataValidation:
             raise NetworkSecurityException(e, sys)
 
     def validate_number_of_columns(self, data: pd.DataFrame) -> bool:
+        """Validate the number of columns in the DataFrame against the schema.
+
+        Args:
+            data (pd.DataFrame): Input dataset to validate.
+
+        Returns:
+            bool: True if the dataset has the expected number of columns, False otherwise.
+        """
         try:
             logging.info("Validating number of columns in the data")
             schema_config = read_yaml_file(self.validation_schema_file_path)
@@ -59,6 +77,19 @@ class DataValidation:
     def detect_data_drift(
         self, base_df: pd.DataFrame, current_df: pd.DataFrame, threshold: float = 0.05
     ) -> bool:
+        """Detect distribution drift between the base and current datasets.
+
+        Uses the Kolmogorov-Smirnov test for each column in the datasets.
+
+        Args:
+            base_df (pd.DataFrame): Reference dataset.
+            current_df (pd.DataFrame): Dataset to compare against the reference.
+            threshold (float): P-value threshold below which drift is flagged.
+
+        Returns:
+            bool: True if no drift is detected, False if drift is detected.
+        """
+
         try:
             logging.info("Detecting data drift between base and current dataframes")
             status = True
@@ -91,6 +122,14 @@ class DataValidation:
     def initiate_data_validation(
         self, artifact: IngestionArtifact
     ) -> DataValidationArtifact:
+        """Run the full data validation workflow for ingested training and testing files.
+
+        Args:
+            artifact (IngestionArtifact): Ingestion artifact containing train and test file paths.
+
+        Returns:
+            DataValidationArtifact: Artifact describing validation results and file locations.
+        """
         try:
             logging.info("Initiating Data Validation")
             train_file_path = artifact.train_file_path
@@ -164,13 +203,7 @@ class DataValidation:
             else:
                 logging.info("Data drift detected between training and testing data")
 
-            return {
-                "valid_train_file_path": self.validation_artifact.valid_train_file_path,
-                "valid_test_file_path": self.validation_artifact.valid_test_file_path,
-                "invalid_train_file_path": self.validation_artifact.invalid_train_file_path,
-                "invalid_test_file_path": self.validation_artifact.invalid_test_file_path,
-                "data_drift_report_file_path": self.validation_artifact.data_drift_report_file_path,
-            }
+            return self.validation_artifact
 
         except Exception as e:
             raise NetworkSecurityException(e, sys)

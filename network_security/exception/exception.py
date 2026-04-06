@@ -1,9 +1,16 @@
 import sys
 from network_security.logging.logger import logging
 
+
 def error_message_detail(error: Exception, error_detail: sys) -> str:
-    """
-    Extracts detailed error message including file name and line number.
+    """Extract detailed exception information including file and line number.
+
+    Args:
+        error (Exception): The original exception object.
+        error_detail (sys): System module used to access traceback information.
+
+    Returns:
+        str: Formatted error message with filename and line number.
     """
     _, _, exc_tb = error_detail.exc_info()
 
@@ -21,8 +28,14 @@ def error_message_detail(error: Exception, error_detail: sys) -> str:
 
 class NetworkSecurityException(Exception):
     def __init__(self, error_msg: Exception, error_detail: sys):
-        """
-        Custom Exception class for better debugging and logging.
+        """Initialize the custom exception with detailed error context.
+
+        Args:
+            error_msg (Exception): The original exception being wrapped.
+            error_detail (sys): System module used to access traceback details.
+
+        Returns:
+            None
         """
         self.error_msg = error_message_detail(error_msg, error_detail)
 
@@ -35,5 +48,5 @@ class NetworkSecurityException(Exception):
         super().__init__(self.error_msg)
 
     def __str__(self):
+        """Return the formatted error message for this exception."""
         return self.error_msg
-    

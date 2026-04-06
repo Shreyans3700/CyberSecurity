@@ -1,3 +1,5 @@
+"""Logging utility that configures a rotating file logger and console handler."""
+
 import logging
 import os
 from datetime import datetime
