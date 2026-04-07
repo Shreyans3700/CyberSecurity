@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import numpy as np
 
 
-@dataclass
 class DataTransformationConstants:
     """
     Class for data transformation constants.
@@ -11,9 +10,8 @@ class DataTransformationConstants:
     TARGET_COLUMN: str = "Result"
     DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
     DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR: str = "transformed_data"
-    DATA_TRANSFORMATION_MODEL_DIR_NAME: str = "data_transformation_model"
+    DATA_TRANSFORMATION_MODEL_DIR_NAME: str = "data_transformation_models"
     DATA_TRANSFORMATION_CONFIGS: dict = {
-        "imputer_strategy": "most_frequent",
         "n_neighbors": 5,
         "weights": "uniform",
         "missing_values": np.nan,

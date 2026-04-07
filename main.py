@@ -3,6 +3,7 @@ from network_security.components.data_validation import DataValidation
 import sys
 from network_security.logging.logger import logging
 from network_security.exception.exception import NetworkSecurityException
+from network_security.components.data_transformation import DataTransformation
 
 if __name__=="__main__":
     try:
@@ -17,7 +18,13 @@ if __name__=="__main__":
         # Step 2: Data Validation
         data_validation = DataValidation()
         validation_artifact = data_validation.initiate_data_validation(data_artifact)
-        logging.info(validation_artifact)
+        
+        # Step 3: Data Transformation
+        data_transformation = DataTransformation(data_validation=validation_artifact)
+        transformation_artifact = data_transformation.initiate_data_transformation()
+        logging.info(transformation_artifact.transformed_train_file_path)
+        logging.info(transformation_artifact.transformed_test_file_path)
+        logging.info(transformation_artifact.data_transformation_model_dir_path)
         
         logging.info("Network security data processing pipeline completed successfully.")
     except Exception as e:

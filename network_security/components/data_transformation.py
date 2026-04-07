@@ -24,10 +24,13 @@ class DataTransformation:
         )
         self.transformed_data_dir = os.path.join(
             os.getcwd(),
+            self.data_transformation_dir,
             DataTransformationConstants.DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR,
         )
         self.data_transformation_model_dir = os.path.join(
-            os.getcwd(), DataTransformationConstants.DATA_TRANSFORMATION_MODEL_DIR_NAME
+            os.getcwd(),
+            self.data_transformation_dir,
+            DataTransformationConstants.DATA_TRANSFORMATION_MODEL_DIR_NAME,
         )
 
         self.target_column = DataTransformationConstants.TARGET_COLUMN
@@ -61,7 +64,6 @@ class DataTransformation:
                 n_neighbors=self.transformation_config["n_neighbors"],
                 weights=self.transformation_config["weights"],
                 missing_values=self.transformation_config["missing_values"],
-                strategy=self.transformation_config["imputer_strategy"],
             )
             return Pipeline(steps=[("imputer", imputer)])
         except Exception as e:
@@ -83,11 +85,11 @@ class DataTransformation:
             )
 
             ## training dataframe
-            X_train = train_df.drop(columns=[self.target_column], axis=1)
+            X_train = train_df.drop(columns=[self.target_column])
             y_train = train_df[self.target_column]
 
             ## testing dataframe
-            X_test = test_df.drop(columns=[self.target_column], axis=1)
+            X_test = test_df.drop(columns=[self.target_column])
             y_test = test_df[self.target_column]
 
             ## ipreprocessor
