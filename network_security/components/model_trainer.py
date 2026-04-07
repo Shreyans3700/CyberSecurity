@@ -1,5 +1,6 @@
 import os
 import sys
+import mlflow
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -43,6 +44,20 @@ class ModelTrainer:
                 ModelTrainerConstants.MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD
             )
             self.data_transformation_artifact = data_transformation_artifact
+        except Exception as e:
+            raise NetworkSecurityException(e, sys) from e
+
+    def track_mlflow(self, best_model, classification_metric):
+        try:
+            with mlflow.start_run():
+                f1_score = classification_metric.f1_score
+                precision_score = classification_metric.precision_score
+                recall_score = classification_metric.recall_score
+
+                mlflow.log_metric("f1_score ", f1_score)
+                mlflow.log_metric("precision ", precision_score)
+                mlflow.log_metric("recall ", recall_score)
+                mlflow.sklearn.log_model(best_model, "model")
         except Exception as e:
             raise NetworkSecurityException(e, sys) from e
 
@@ -97,9 +112,13 @@ class ModelTrainer:
 
         classification_train_metrics = get_classification_metrics(y_train, y_train_pred)
 
+        self.track_mlflow(best_model, classification_train_metrics)
+
         y_test_pred = best_model.predict(X_test)
 
         classification_test_metrics = get_classification_metrics(y_test, y_test_pred)
+
+        self.track_mlflow(best_model, classification_test_metrics)
 
         preprocessor = load_object(
             f"{self.data_transformation_artifact.data_transformation_model_dir_path}/preprocessor.pkl"
