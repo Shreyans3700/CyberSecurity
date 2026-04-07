@@ -128,7 +128,7 @@ class DataTransformation:
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_train_file_path=transformed_train_file_path,
                 transformed_test_file_path=transformed_test_file_path,
-                data_transformation_model_dir_path=preprocessor_file_path,
+                data_transformation_model_dir_path=self.data_transformation_model_dir,
             )
 
             return data_transformation_artifact
