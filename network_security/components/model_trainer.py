@@ -129,8 +129,10 @@ class ModelTrainer:
         logging.info(
             f"Classification metrics for the best model on training data: {classification_train_metrics}"
         )
-        os.makedirs(self.model_trainer_dir, exist_ok=True)
-        save_object(self.model_trained_file_path, best_model)
+
+        save_object("final_models/model.pkl", best_model)
+        save_object("final_models/preprocessor.pkl", preprocessor)
+
         model_trainer_artifact = ModelTrainerArtifact(
             model_file_path=self.model_trained_file_path,
             model_dir_path=self.model_trainer_dir,

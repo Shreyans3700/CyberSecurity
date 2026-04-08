@@ -8,4 +8,5 @@ certifi
 scipy
 pyaml
 mlflow
+fastapi
 # -e .
