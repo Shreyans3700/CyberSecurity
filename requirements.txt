@@ -9,4 +9,5 @@ scipy
 pyaml
 mlflow
 fastapi
+python-multipart
 # -e .
